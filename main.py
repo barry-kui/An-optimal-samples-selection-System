@@ -1,17 +1,11 @@
+import os
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow
-
-
-import P2
-import S3
-import S4
-import S5
-import P11
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    MainWindow = QMainWindow()
-    ui = P2.Ui_P2()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+def file_display():
+    file_path = f"./Data/45-7-4-3-3-1-14.txt"
+    with open(file_path, "r") as file:
+        file_lines = file.readlines()
+        file_lines = [line.strip() for line in file_lines]
+        for line in range(len(file_lines)):
+            optimal_value = f"{line + 1}: {file_lines[line]}"
+            print(optimal_value)
+file_display()
