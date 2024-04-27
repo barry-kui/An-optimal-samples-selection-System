@@ -2,7 +2,8 @@ import os
 import random
 import sys
 import time
-
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, \
     QMessageBox, QListWidget, QSpinBox, QStackedWidget, QRadioButton, QScrollArea, QScrollBar, QGridLayout,QButtonGroup
@@ -11,6 +12,7 @@ from PyQt5.QtCore import Qt
 
 
 class MainWindow(QWidget):
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Optimal Sample Selection System')
@@ -37,11 +39,13 @@ class MainWindow(QWidget):
         layout = QVBoxLayout(self)
         layout.addWidget(self.stacked_widget)
 
+
     def go_to_Select_page(self):
         self.stacked_widget.setCurrentIndex(0)
 
     def go_to_File_page(self):
         self.stacked_widget.setCurrentIndex(1)
+        #print(os.listdir("./Data"))
 
     def go_to_function_choice(self):
         self.stacked_widget.setCurrentIndex(2)
@@ -65,6 +69,8 @@ class SelectionPage(QWidget):
     def P1gui(self):
         self.setWindowTitle("Optimal Sample Selection System")
         self.resize(12800,960)
+        self.choice = 0
+        self.Print_init = 0
         #layout
         main_layout = QVBoxLayout()
         m_n_layout = QHBoxLayout()
@@ -212,43 +218,61 @@ class SelectionPage(QWidget):
         m = self.input_m.value()
         n = self.input_n.value()
         self.execute_times = 0
-        if self.choice == True:
-            self.input_str = self.userlist.text()
-            self.input_list = self.input_str.split(',')
-            self.n_group = self.input_list
-            print(self.input_str)
-        else:
-            self.n_group = random_samples(m,n)
-        for i in range(len(self.n_group)):
-            input_value = f"{i+1}#: {self.n_group[i]}\n"
-            self.input_value.addItem(str(input_value))
+        self.Print_init = 1
+        try:
+            if self.choice == 0:
+                raise ValueError
+            if self.choice == 1:
+                self.input_str = self.userlist.text()
+                self.input_list = self.input_str.split(',')
+                self.n_group = self.input_list
+                for j in range(len(self.n_group)):
+                    if self.n_group[j] > 54 or not isinstance(self.n_group[j],int) or self.n_group[j] == 0:
+                        raise TypeError
+                print(self.input_str)
+            elif self.choice == 2:
+                self.n_group = random_samples(m,n)
+            for i in range(len(self.n_group)):
+                input_value = f"{i+1}#: {self.n_group[i]}\n"
+                self.input_value.addItem(str(input_value))
+        except ValueError:
+            QMessageBox.warning(self, "error", "Please choice a method first")
+        except TypeError:
+            QMessageBox.warning(self, "error", "Please input the number in range 1-54 or in int")
+
+
     def execute_click(self):
         self.result.clear()
         k = self.input_k.value()
         j = self.input_j.value()
         s = self.input_s.value()
-        n_group = self.n_group
+        try:
+            if self.Print_init == 0:
+                raise ValueError
+            n_group = self.n_group
 
-        start_time = time.time()
-        self.optimal_group = select_k(n_group,k,j,s)
-        end_time = time.time()
-        self.execute_times+=1
+            start_time = time.time()
+            self.optimal_group = select_k(n_group,k,j,s)
+            end_time = time.time()
+            self.execute_times += 1
 
-        for group in range(len(self.optimal_group)):
-            optimal_value = f"{group+1}: {self.optimal_group[group]}"
-            self.result.addItem(str(optimal_value))
-        self.final_result = str(f"{self.input_m.value()}-{self.input_n.value()}-{k}-{j}-{s}-{self.execute_times}-{group+1}")
-        self.result.addItem(self.final_result)
-        result = f"{end_time-start_time}s"
-        self.time_cost.setText(result)
+            for group in range(len(self.optimal_group)):
+                optimal_value = f"{group+1}: {self.optimal_group[group]}"
+                self.result.addItem(str(optimal_value))
+            self.final_result = str(f"{self.input_m.value()}-{self.input_n.value()}-{k}-{j}-{s}-{self.execute_times}-{group+1}")
+            self.result.addItem(self.final_result)
+            result = f"{end_time-start_time}s"
+            self.time_cost.setText(result)
+        except ValueError:
+            QMessageBox.warning(self, "error", "Please Press Print to generate n_group first")
 
     def Random_n_value(self,checked):
         if checked:
             if self.Random_n.isChecked():
-                self.choice = False
+                self.choice = 2
                 pass
             elif self.User_Input_n.isChecked():
-                self.choice = True
+                self.choice = 1
 
 
     def save_data(self,output,filename):
@@ -258,17 +282,17 @@ class SelectionPage(QWidget):
         os.chdir("Data")
         if os.path.exists(filename):
             os.remove(filename)
-            with open(filename, 'a',buffering=1) as file:
+            with open(filename, 'a') as file:
                 for group in output:
                     file.write(str(group)+'\n')
                 self.update()
-                print(os.getcwd())
+
                 os.chdir(os.path.dirname(os.getcwd()))
             QMessageBox.information(self,"Information",f"The data {filename} be replaces")
             return 0
 
         else:
-            with open(filename, 'a',buffering=1) as file:
+            with open(filename, 'a') as file:
                 for group in output:
                     file.write(str(group)+'\n')
                 file.flush()
@@ -340,19 +364,14 @@ class FilePage(QWidget):
         secondlayer_layout.addWidget(self.file6)
         main_layout.addLayout(secondlayer_layout)
 
-        self.group = QButtonGroup()
-        self.group.addButton(self.file1)
-        self.group.addButton(self.file2)
-        self.group.addButton(self.file3)
-        self.group.addButton(self.file4)
-        self.group.addButton(self.file5)
-        self.group.addButton(self.file6)
 
-        '''
         #third
         self.file7 = QRadioButton()
         self.file8 = QRadioButton()
         self.file9 = QRadioButton()
+        self.file7.clicked.connect(self.file_clicked)
+        self.file8.clicked.connect(self.file_clicked)
+        self.file9.clicked.connect(self.file_clicked)
         thirdlayer_layout.addWidget(self.file7)
         thirdlayer_layout.addWidget(self.file8)
         thirdlayer_layout.addWidget(self.file9)
@@ -362,11 +381,30 @@ class FilePage(QWidget):
         self.file10 = QRadioButton()
         self.file11 = QRadioButton()
         self.file12 = QRadioButton()
+        self.file10.clicked.connect(self.file_clicked)
+        self.file11.clicked.connect(self.file_clicked)
+        self.file12.clicked.connect(self.file_clicked)
         fourthlayer_layout.addWidget(self.file10)
         fourthlayer_layout.addWidget(self.file11)
         fourthlayer_layout.addWidget(self.file12)
         main_layout.addLayout(fourthlayer_layout)
-        '''
+
+
+        self.group = QButtonGroup()
+        self.group.addButton(self.file1, 1)
+        self.group.addButton(self.file2, 2)
+        self.group.addButton(self.file3, 3)
+        self.group.addButton(self.file4, 4)
+        self.group.addButton(self.file5, 5)
+        self.group.addButton(self.file6, 6)
+        self.group.addButton(self.file7, 7)
+        self.group.addButton(self.file8, 8)
+        self.group.addButton(self.file9, 9)
+        self.group.addButton(self.file10, 10)
+        self.group.addButton(self.file11, 11)
+        self.group.addButton(self.file12, 12)
+
+
         #output
         Rarea = QScrollArea()
         self.result = QListWidget()
@@ -380,52 +418,28 @@ class FilePage(QWidget):
         Previous.setText("Previous")
         Previous.clicked.connect(self.main_window.go_to_Select_page)
         ReFliter = QPushButton()
-        ReFliter.setText("Re-FLIER")
+        ReFliter.setText("ReFlash")
+        ReFliter.clicked.connect(self.reflash)
         button_layout.addWidget(Previous)
         button_layout.addWidget(ReFliter)
         output_layout.addLayout(button_layout)
         main_layout.addLayout(output_layout)
 
 
-        self.show_file()
         self.setLayout(main_layout)
 
     def show_file(self):
-        current_file = os.chdir("Data")
-        file_list = os.listdir(current_file)
-        if len(file_list) == 1:
-            self.file1.setText(f"{file_list[0]}")
-        elif len(file_list) == 2:
-            self.file1.setText(f"{file_list[0]}")
-            self.file2.setText(f"{file_list[1]}")
-        elif len(file_list) == 3:
-            self.file1.setText(f"{file_list[0]}")
-            self.file2.setText(f"{file_list[1]}")
-            self.file3.setText(f"{file_list[2]}")
-        elif len(file_list) == 4:
-            self.file1.setText(f"{file_list[0]}")
-            self.file2.setText(f"{file_list[1]}")
-            self.file3.setText(f"{file_list[2]}")
-            self.file4.setText(f"{file_list[3]}")
-        elif len(file_list) == 5:
-            self.file1.setText(f"{file_list[0]}")
-            self.file2.setText(f"{file_list[1]}")
-            self.file3.setText(f"{file_list[2]}")
-            self.file4.setText(f"{file_list[3]}")
-            self.file5.setText(f"{file_list[4]}")
-        elif len(file_list) == 6:
-            self.file1.setText(f"{file_list[0]}")
-            self.file2.setText(f"{file_list[1]}")
-            self.file3.setText(f"{file_list[2]}")
-            self.file4.setText(f"{file_list[3]}")
-            self.file5.setText(f"{file_list[4]}")
-            self.file6.setText(f"{file_list[5]}")
+        os.chdir("Data")
+        file_list = os.listdir('.')
+        for i in range(len(file_list)):
+            self.group.button(i+1).setText(str(file_list[i]))
         os.chdir(os.path.dirname(os.getcwd()))
 
     def file_clicked(self):
         self.button_name = self.sender().text()
 
     def file_display(self):
+        self.result.clear()
         os.chdir("Data")
         file_path = f"{self.button_name}"
         try:
@@ -434,7 +448,6 @@ class FilePage(QWidget):
                 file_lines = [line.strip() for line in file_lines]
                 for line in range(len(file_lines)):
                     optimal_value = f"{line + 1}: {file_lines[line]}"
-                    print(f"{optimal_value}")
                     self.result.addItem(optimal_value)
             os.chdir(os.path.dirname(os.getcwd()))
 
@@ -442,13 +455,18 @@ class FilePage(QWidget):
             print("File")
         except Exception as e:
             print(f"File Error: {e}")
-
+    def reflash(self):
+        for i in range(0,12):
+            self.group.button(i+1).setText(str(" "))
+        self.show_file()
     def Delet_clicked(self):
+        os.chdir("Data")
         file_path = f"{self.button_name}"
         if os.path.exists(file_path):
             os.remove(file_path)
         QMessageBox.information(self, "Information",f"{self.button_name}is delete")
-        self.update()
+        os.chdir(os.path.dirname(os.getcwd()))
+        self.reflash()
 
 
 
