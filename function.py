@@ -29,7 +29,7 @@ def greedy_selection(k_group,j_group,s):
             uncovered_j_group -= covered_j_group[best_fit]
         else:
             break
-    result = list(selected_k_group)
+    result = list(map(lambda a: list(a) ,selected_k_group))
     return result
 
 def select_k(base_samples,k,j,s):
