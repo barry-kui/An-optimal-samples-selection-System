@@ -11,92 +11,38 @@ def combination(samples,num):
     return list(itertools.combinations(samples,num))
 
 
-'''def selection(k_group,j_group,s):
-    def check_same(list):
-        if len(list) <= 1: return True
-        if list[0] != list[1]: return False
-        return check_same(list[1:])
-    
-    def compare(k_group,j_group,fit_list,total):
-        MAX_k = []
-        if len(j_group) == 0:
-            return MAX_k
+def greedy_selection(k_group,j_group,s):
+    #all k_group change to set
+    k_group = set(map(frozenset,k_group))
+    #all j_group change to set
+    uncovered_j_group = set(map(frozenset,j_group))
+    #choiced k_group
+    selected_k_group = []
+    #the j of each k cover,store in to a dict key:k
+    covered_j_group = {k: {j for j in uncovered_j_group if len(set(k) & j) >= s} for k in k_group}
+    while uncovered_j_group:
+        best_fit = max(covered_j_group,key=lambda i: len(covered_j_group[i] & uncovered_j_group),default=None)
 
-        for k in k_group:
-            fit = 0
-            j_list = []
-            k_cover_j = []
-            for j in j_group:
-                if len(set(k) & set(j)) >= s:
-                    fit = fit + 1
-                    j_list.append(j)
-            k_cover_j.append(k)
-            k_cover_j.append(j_list)
-            total.append(k_cover_j)
-            fit_list.append(fit)
-def compare(k_group,j_group,s):
-    fit_list = []
-    total = []
-    for k in k_group:
-        fit = 0
-        j_list = []
-        k_cover_j = []
-        for j in j_group:
-            if len(set(k) & set(j)) >= s:
-                fit = fit+1
-                j_list.append(j)
-        k_cover_j.append(k)
-        k_cover_j.append(j_list)
-        total.append(k_cover_j)
-        fit_list.append(fit)
-    return fit_list,total'''
-def compare_recursive(k_group, j_group, s, Max=None):
-    fit_list = []
-    total = []
-    if Max is None:
-        Max = []
+        if best_fit and covered_j_group[best_fit]:
 
-    if len(j_group) == 0:
-        return Max
-
-    for k in k_group:
-        fit = 0
-        j_list = []
-        k_cover_j = []
-        for j in j_group:
-            if len(set(k) & set(j)) >= s:
-                fit += 1
-                j_list.append(j)
-        k_cover_j.append(k)
-        k_cover_j.append(j_list)
-        total.append(k_cover_j)
-        fit_list.append(fit)
-
-    a = fit_list.index(max(fit_list))
-    Max.append(total[a][0])
-    k_group.remove(total[a][0])
-    j_group = [j for j in j_group if j not in total[a][1]]
-
-    return compare_recursive(k_group, j_group, s, Max)
+            selected_k_group.append(best_fit)
+            uncovered_j_group -= covered_j_group[best_fit]
+        else:
+            break
+    result = list(selected_k_group)
+    return result
 
 def select_k(base_samples,k,j,s):
     k_group = combination(base_samples, k)
-    j_group = combination(base_samples, j)
     random.shuffle(k_group)
-    result = compare_recursive(k_group, j_group,s)
+    j_group = combination(base_samples, j)
+    result = greedy_selection(k_group, j_group,s)
     return result
 
-'''    while len(j_group) != 0:
-            a = index(max(fit_list))
-            fit_list.remove(fit_list[a])
-            Max.append(total[a][1])
-            k_group.remove(total[a][1])
-            j_group = [j for j in j_group if j not in total[a][2]]
-            fit_list, total = compare(k_group, j_group)
-'''
 
 if __name__ == '__main__':
-    print(random_samples(45,7))
+    base_samples = random_samples(45,13)
+    print(select_k(base_samples,6,6,5))
 
 
 

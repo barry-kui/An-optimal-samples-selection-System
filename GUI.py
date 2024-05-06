@@ -68,7 +68,7 @@ class SelectionPage(QWidget):
 
     def P1gui(self):
         self.setWindowTitle("Optimal Sample Selection System")
-        self.resize(12800,960)
+        self.resize(1280,960)
         self.choice = 0
         self.Print_init = 0
         #layout
