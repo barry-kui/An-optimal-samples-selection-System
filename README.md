@@ -7,7 +7,7 @@
 安装和使用
 pip install PyQt5 和 numpy 库即可
 
-![image](./resource/1.png)
-![image](./resource/2.png)
-![image](./resource/3.png)
-![image](./resource/4.png)
+![image](https://github.com/barry-kui/An-optimal-samples-selection-System/resource/1.png)
+![image](https://github.com/barry-kui/An-optimal-samples-selection-System/resource/2.png)
+![image](https://github.com/barry-kui/An-optimal-samples-selection-System/resource/3.png)
+![image](https://github.com/barry-kui/An-optimal-samples-selection-System/resource/4.png)
