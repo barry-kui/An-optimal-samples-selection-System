@@ -32,9 +32,8 @@ class MainWindow(QWidget):
         self.stacked_widget.addWidget(self.file_screen)
         self.stacked_widget.addWidget(self.function_screen)
         self.stacked_widget.addWidget(self.position_number_screen)
+
         '''
-        
-        
         self.stacked_widget.addWidget(self.position_range_number_screen)
         self.stacked_widget.addWidget(self.select_position_screen)
         '''
@@ -429,7 +428,7 @@ class FilePage(QWidget):
         ReFilter.clicked.connect(self.main_window.go_to_function_choice)
         button_layout.addWidget(Previous)
         button_layout.addWidget(ReFlash)
-        button_layout.addWidget(ReFilter)
+        #button_layout.addWidget(ReFilter)
         output_layout.addLayout(button_layout)
         main_layout.addLayout(output_layout)
 
@@ -492,43 +491,35 @@ class FilterPage(QWidget):
         main_layout.addWidget(Title,0 ,Qt.AlignHCenter)
         main_layout.addWidget(QLabel("Please select the filter methods:"), 0, Qt.AlignLeft)
         #radiobutton
-        PN_button = QRadioButton()
-        PN_button.setChecked(True)
-        PN_button.setText("Define positions and numbers")
-        PN_button.clicked.connect(self.method_select)
+        self.PN_button = QRadioButton()
+        self.PN_button.setChecked(True)
+        self.PN_button.setText("Define positions and numbers")
 
-        PRN_button = QRadioButton()
 
-        PRN_button.setText("Defin position and range of numbers")
-        PRN_button.clicked.connect(self.method_select)
+        self.PRN_button = QRadioButton()
 
-        PFN_button = QRadioButton()
-        PFN_button.setText("Select positions as fixed number")
-        PFN_button.clicked.connect(self.method_select)
+        self.PRN_button.setText("Defin position and range of numbers")
 
-        self.group = QButtonGroup()
-        self.group.addButton(PN_button,1)
-        self.group.addButton(PRN_button,2)
-        self.group.addButton(PFN_button,3)
-        radio_layout.addWidget(PN_button)
-        radio_layout.addWidget(PRN_button)
-        radio_layout.addWidget(PFN_button)
+
+        self.PFN_button = QRadioButton()
+        self.PFN_button.setText("Select positions as fixed number")
+
+
+        radio_layout.addWidget(self.PN_button)
+        radio_layout.addWidget(self.PRN_button)
+        radio_layout.addWidget(self.PFN_button)
         radio_layout.addWidget(QLabel(" "))
         radio_layout.addWidget(QLabel(" "))
         main_layout.addLayout(radio_layout)
 
         previous = QPushButton("Previous")
-        next = QPushButton("Next")
-        next.clicked.connect(self.main_window.go_to_position_number_page)
+        self.next = QPushButton("Next")
+        self.next.clicked.connect(self.main_window.go_to_position_number_page)
         button_layout.addWidget(previous,0,Qt.AlignHCenter)
-        button_layout.addWidget(next,0,Qt.AlignHCenter)
+        button_layout.addWidget(self.next,0,Qt.AlignHCenter)
 
         main_layout.addLayout(button_layout)
         self.setLayout(main_layout)
-    def method_select(self):
-        return print(self.sender())
-    def method_page(self):
-
 class PNPage(QWidget):
     def __init__(self,main_window):
         super().__init__()
@@ -537,12 +528,9 @@ class PNPage(QWidget):
 
     def P4gui(self):
         main_layout = QVBoxLayout()
-        radio_layout = QVBoxLayout()
-        button_layout = QHBoxLayout()
-
-        Title = QLabel("Optimal Sample Selection System")
-        main_layout.addWidget(Title,0,Qt.AlignHCenter)
+        main_layout.addWidget(QLabel("wahahah"))
         self.setLayout(main_layout)
+
 
 
 if __name__ == "__main__":
