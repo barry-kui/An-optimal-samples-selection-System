@@ -21,18 +21,20 @@ class MainWindow(QWidget):
         self.stacked_widget = QStackedWidget(self)
         self.select_screen = SelectionPage(self)
         self.file_screen = FilePage(self)
-        '''
-        self.function_screen = FCPage(self)
+        self.function_screen = FilterPage(self)
         self.position_number_screen = PNPage(self)
+        '''
+        
         self.position_range_number_screen = PNRPage(self)
         self.select_position_screen = SPPage(self)
         '''
         self.stacked_widget.addWidget(self.select_screen)
         self.stacked_widget.addWidget(self.file_screen)
-
-        '''
         self.stacked_widget.addWidget(self.function_screen)
         self.stacked_widget.addWidget(self.position_number_screen)
+        '''
+        
+        
         self.stacked_widget.addWidget(self.position_range_number_screen)
         self.stacked_widget.addWidget(self.select_position_screen)
         '''
@@ -123,11 +125,13 @@ class SelectionPage(QWidget):
         #Random n & input n
         self.Random_n = QRadioButton(self)
         self.Random_n.setText("Random n")
+        self.Random_n.setChecked(True)
         button_layout.addWidget(self.Random_n)
 
         #Input n
         self.User_Input_n = QRadioButton(self)
         self.User_Input_n.setText("Input n")
+
         button_layout.addWidget(self.User_Input_n)
         self.User_Input_n.toggled.connect(self.Random_n_value)
         self.Random_n.toggled.connect(self.Random_n_value)
@@ -220,17 +224,15 @@ class SelectionPage(QWidget):
         self.execute_times = 0
         self.Print_init = 1
         try:
-            if self.choice == 0:
-                raise ValueError
-            if self.choice == 1:
+            if self.User_Input_n.isChecked() == True:
                 self.input_str = self.userlist.text()
                 self.input_list = self.input_str.split(',')
-                self.n_group = self.input_list
+                self.n_group = [int(i) for i in self.input_list]
                 for j in range(len(self.n_group)):
                     if self.n_group[j] > 54 or not isinstance(self.n_group[j],int) or self.n_group[j] == 0:
                         raise TypeError
-                print(self.input_str)
-            elif self.choice == 2:
+
+            elif self.Random_n.isChecked() == True:
                 self.n_group = random_samples(m,n)
             for i in range(len(self.n_group)):
                 input_value = f"{i+1}#: {self.n_group[i]}\n"
@@ -265,6 +267,8 @@ class SelectionPage(QWidget):
             self.time_cost.setText(result)
         except ValueError:
             QMessageBox.warning(self, "error", "Please Press Print to generate n_group first")
+
+
 
     def Random_n_value(self,checked):
         if checked:
@@ -417,11 +421,15 @@ class FilePage(QWidget):
         Previous = QPushButton()
         Previous.setText("Previous")
         Previous.clicked.connect(self.main_window.go_to_Select_page)
-        ReFliter = QPushButton()
-        ReFliter.setText("ReFlash")
-        ReFliter.clicked.connect(self.reflash)
+        ReFlash = QPushButton()
+        ReFlash.setText("ReFlash")
+        ReFlash.clicked.connect(self.reflash)
+        ReFilter = QPushButton()
+        ReFilter.setText("Re_Filter")
+        ReFilter.clicked.connect(self.main_window.go_to_function_choice)
         button_layout.addWidget(Previous)
-        button_layout.addWidget(ReFliter)
+        button_layout.addWidget(ReFlash)
+        button_layout.addWidget(ReFilter)
         output_layout.addLayout(button_layout)
         main_layout.addLayout(output_layout)
 
@@ -466,10 +474,75 @@ class FilePage(QWidget):
             os.remove(file_path)
         QMessageBox.information(self, "Information",f"{self.button_name}is delete")
         os.chdir(os.path.dirname(os.getcwd()))
+        self.result.clear()
         self.reflash()
 
+class FilterPage(QWidget):
+    def __init__(self,main_window):
+        super().__init__()
+        self.main_window = main_window
+        self.P3gui()
 
+    def P3gui(self):
+        main_layout = QVBoxLayout()
+        radio_layout = QVBoxLayout()
+        button_layout = QHBoxLayout()
 
+        Title = QLabel("Optimal Sample Selection System")
+        main_layout.addWidget(Title,0 ,Qt.AlignHCenter)
+        main_layout.addWidget(QLabel("Please select the filter methods:"), 0, Qt.AlignLeft)
+        #radiobutton
+        PN_button = QRadioButton()
+        PN_button.setChecked(True)
+        PN_button.setText("Define positions and numbers")
+        PN_button.clicked.connect(self.method_select)
+
+        PRN_button = QRadioButton()
+
+        PRN_button.setText("Defin position and range of numbers")
+        PRN_button.clicked.connect(self.method_select)
+
+        PFN_button = QRadioButton()
+        PFN_button.setText("Select positions as fixed number")
+        PFN_button.clicked.connect(self.method_select)
+
+        self.group = QButtonGroup()
+        self.group.addButton(PN_button,1)
+        self.group.addButton(PRN_button,2)
+        self.group.addButton(PFN_button,3)
+        radio_layout.addWidget(PN_button)
+        radio_layout.addWidget(PRN_button)
+        radio_layout.addWidget(PFN_button)
+        radio_layout.addWidget(QLabel(" "))
+        radio_layout.addWidget(QLabel(" "))
+        main_layout.addLayout(radio_layout)
+
+        previous = QPushButton("Previous")
+        next = QPushButton("Next")
+        next.clicked.connect(self.main_window.go_to_position_number_page)
+        button_layout.addWidget(previous,0,Qt.AlignHCenter)
+        button_layout.addWidget(next,0,Qt.AlignHCenter)
+
+        main_layout.addLayout(button_layout)
+        self.setLayout(main_layout)
+    def method_select(self):
+        return print(self.sender())
+    def method_page(self):
+
+class PNPage(QWidget):
+    def __init__(self,main_window):
+        super().__init__()
+        self.main_window = main_window
+        self.P4gui()
+
+    def P4gui(self):
+        main_layout = QVBoxLayout()
+        radio_layout = QVBoxLayout()
+        button_layout = QHBoxLayout()
+
+        Title = QLabel("Optimal Sample Selection System")
+        main_layout.addWidget(Title,0,Qt.AlignHCenter)
+        self.setLayout(main_layout)
 
 
 if __name__ == "__main__":
