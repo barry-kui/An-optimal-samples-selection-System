@@ -7,7 +7,7 @@
 安装和使用
 pip install PyQt5 和 numpy 库即可
 
-![image](https://github.com/barry-kui/An-optimal-samples-selection-System/resources/1.png)
-![image](https://github.com/barry-kui/An-optimal-samples-selection-System/resources/2.png)
-![image](https://github.com/barry-kui/An-optimal-samples-selection-System/resources/3.png)
-![image](https://github.com/barry-kui/An-optimal-samples-selection-System/resources/4.png)
+![image]([https://github.com/barry-kui/An-optimal-samples-selection-System/resources](https://github.com/barry-kui/An-optimal-samples-selection-System/tree/main/resources)/1.png)
+![image]([https://github.com/barry-kui/An-optimal-samples-selection-System/resources](https://github.com/barry-kui/An-optimal-samples-selection-System/tree/main/resources)/2.png)
+![image]([https://github.com/barry-kui/An-optimal-samples-selection-System/resources](https://github.com/barry-kui/An-optimal-samples-selection-System/tree/main/resources)/3.png)
+![image]([https://github.com/barry-kui/An-optimal-samples-selection-System/resources](https://github.com/barry-kui/An-optimal-samples-selection-System/tree/main/resources)/4.png)
